@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown to Secrets</title>
+  <link href="https://fonts.googleapis.com/css?family=Creepster" rel="stylesheet">
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2.5rem;
+      padding: 2rem;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Creepster', cursive;
+    }
+
+    #datetime { font-size: 2.5rem; text-shadow: 0 0 5px #fff; }
+    #timer    { font-size: 8rem;   text-shadow: 0 0 15px #fff; animation: flicker 1.5s infinite; }
+    #message  { font-size: 3rem;   text-shadow: 0 0 5px red; }
+
+    .images {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 800px;
+    }
+    .images img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border: 2px solid #444;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+    @keyframes shake {
+      0%   { transform: translate(0,0); }
+      25%  { transform: translate(2px,-2px) rotate(-1deg); }
+      50%  { transform: translate(-2px,2px) rotate(1deg); }
+      75%  { transform: translate(2px,2px) rotate(0deg); }
+      100% { transform: translate(0,0); }
+    }
+    .shake { animation: shake 0.6s ease-in-out; }
+
+    /* Lightbox overlay */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      cursor: pointer;
+    }
+    #overlay img {
+      max-width: 90%;
+      max-height: 90%;
+      box-shadow: 0 0 20px #000;
+      border-radius: 4px;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div id="datetime">June 22, 2025 10:00 PM EST</div>
+  <div id="timer">00:00:00:00</div>
+  <div id="message">All secrets of Yusuf7n will be revealed s00n.</div>
+
+  <!-- Row 1 -->
+  <div class="images">
+    <img src="images/image1.png" alt="">
+    <img src="images/image2.png" alt="">
+    <img src="images/image3.png" alt="">
+  </div>
+  <!-- Row 2 -->
+  <div class="images">
+    <img src="images/image4.png" alt="">
+    <img src="images/image5.png" alt="">
+    <img src="images/image6.png" alt="">
+  </div>
+  <!-- Row 3 -->
+  <div class="images">
+    <img src="images/image7.png" alt="">
+    <img src="images/image8.png" alt="">
+    <img src="images/image9.png" alt="">
+  </div>
+
+  <!-- Lightbox overlay -->
+  <div id="overlay">
+    <img id="overlay-img" src="" alt="Full size">
+  </div>
+
+  <audio id="bg-audio" src="audio.mp3" loop></audio>
+
+  <script>
+    // Countdown
+    function updateTimer() {
+      const target = new Date("June 22, 2025 22:00:00 GMT-0500").getTime();
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) {
+        document.getElementById("timer").textContent = "00:00:00:00";
+        clearInterval(timerInterval);
+        return;
+      }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hrs  = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+      const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+      const secs = Math.floor((diff % (1000*60)) / 1000);
+      document.getElementById("timer").textContent =
+        String(days).padStart(2,'0') + ":" +
+        String(hrs).padStart(2,'0') + ":" +
+        String(mins).padStart(2,'0') + ":" +
+        String(secs).padStart(2,'0');
+    }
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Message rotation + shake
+    const messages = [
+      "All secrets of Yusuf7n will be revealed s00n.",
+      "You've met with a terrible fate, haven't you?",
+      "Yusuf sold his soul on March 13, 2023."
+    ];
+    let msgIdx = 0, msgEl = document.getElementById("message");
+    setInterval(() => {
+      msgIdx = (msgIdx + 1) % messages.length;
+      msgEl.textContent = messages[msgIdx];
+      msgEl.classList.add("shake");
+      msgEl.addEventListener('animationend', () => msgEl.classList.remove("shake"), { once: true });
+    }, 5000);
+
+    // Audio autoplay
+    window.addEventListener('load', () => {
+      document.getElementById('bg-audio').play().catch(() => {});
+    });
+
+    // Lightbox behavior
+    const overlay = document.getElementById('overlay');
+    const overlayImg = document.getElementById('overlay-img');
+    document.querySelectorAll('.images img').forEach(img => {
+      img.addEventListener('click', () => {
+        overlayImg.src = img.src;
+        overlay.style.display = 'flex';
+      });
+    });
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+    });
+    overlayImg.addEventListener('click', e => e.stopPropagation());
+  </script>
+</body>
+</html>
